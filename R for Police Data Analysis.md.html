@@ -1,0 +1,58 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><title>R for Police Data Analysis.md</title><style></style></head><body id="preview">
+<h1><a id="R_for_Police_Data_Analysis_0"></a>R for Police Data Analysis</h1>
+<h3><a id="Interesting_Tools_for_Crime_Data_Analysis_1"></a>Interesting Tools for Crime Data Analysis</h3>
+<p>Divit Jawa<br>
+12-07-2018</p>
+<h2><a id="Setup_5"></a>Setup</h2>
+<h4><a id="Required_Softwares_7"></a>Required Software(s)</h4>
+<ul>
+<li>R/RStudio</li>
+</ul>
+<h4><a id="Required_Libraries_10"></a>Required Libraries:</h4>
+<p><code>if(!require(dplyr)) install.packages(&quot;dplyr&quot;)</code><br>
+<code>if(!require(plotly)) install.packages(&quot;plotly&quot;)</code><br>
+<code>if(!require(ggplot2)) install.packages(&quot;ggplot2&quot;)</code></p>
+<h2><a id="Background__Objectives_21"></a>Background &amp; Objectives</h2>
+<p>I am working as a Cadet with the <a href="http://police.uw.edu/">University of Washington Police Department</a>, and will soon<br>
+be working in their research department. I have been reading some academic articles and blogs on Crime and Police data<br>
+analysis, and I realized that the most important task is to find trends in data. These<br>
+trends can help find a pattern that may prevent a crime from happening.</p>
+<h1><a id="The_data_27"></a>The data</h1>
+<p>The dataset I worked with was the <a href="Info201_Final_Repository/data/Seattle_PD_data.bz2">Seattle 911 Calls dataset</a>. It had information about call id, lat, long, call type, call subtype, resolution type(ticket, arrest etc.), date, and several other columns for the years 2010 - 2017. The dataset contains about 1.4 million rows, so it might be a little slow to work with.</p>
+<p>Here is a screenshot of the datset.<br>
+<img src="https://imgur.com/ozk6EbZ.png" alt="Screenshot of Seattle Police 911 dataset"></p>
+<h1><a id="Data_Processing_34"></a>Data Processing</h1>
+<h2><a id="Reading_the_data_35"></a>Reading the data</h2>
+<p>This dataset is <strong>huge</strong>, so it might take about 30 seconds for the dataset to load. Be patient.<br>
+<code>police_data &lt;- data.table::fread(&quot;./data/Seattle_PD_data.bz2, header = FALSE, sep = &quot;,&quot;)</code><br>
+If you feel the dataset is too big, you may want to trim it down by using this command. Beware, you need to follow this command <strong>AFTER</strong> you have done the first one, stated above.<br>
+<code>police_data &lt;- sample_n(police_data, 25000)</code><br>
+This will trim the dataset to 25,000 rows from 1.4 million. A much more usable dataset.</p>
+<h1><a id="Data_Analysis_47"></a>Data Analysis</h1>
+<p>One thing that you would definitely want to do is summarize the data in the dataset to get basic information like how much crime of each category was committed in each year, and similar questions.</p>
+<pre><code>data_2013 &lt;-
+  group_by(police_data, V6) %&gt;% dplyr::filter(grepl('2013', V8)) %&gt;% summarise(freq = n()) 
+ggplot(data = data_2013, aes(
+  x = reorder(V6, freq),
+  y = freq,
+  width = .5,
+  fill = V6
+)) +
+  geom_bar(stat = 'identity',
+           position = 'dodge',
+           width = 400) +
+  coord_flip() + labs(title = &quot;Crime rates in 2013&quot;, x = &quot;Crime Groups&quot;, y = &quot;Frequency&quot;)
+
+</code></pre>
+<p>This creates a crime report for the data of 2012 &amp; 2013. Here is what they look like:</p>
+<p><img src="https://imgur.com/QZzK3PN.png" alt="Crime report of Seattle for 2012"><br>
+<img src="https://imgur.com/0KljJVp.png" alt="Crime report of Seattle for 2013"></p>
+<p>This is the plot created for the entire dataset consisting of the 1.4 million rows. I used the full dataset, and created summary plots for 2012 and 2013 and found something shocking!</p>
+<h2><a id="The_Revelation_74"></a>The Revelation:</h2>
+<p>When I analyzed the entire dataset for the years 2012 and 2013, I found that there was a <strong>HUGE</strong> difference in the crime rates for the 2 years. An interesting event that happened between 2012 and 2013 was that the <a href="https://en.wikipedia.org/wiki/Washington_Initiative_502">i-502</a> intitiative was passed, and Marijuana was legalized.</p>
+<p>Look at how the scales have changed between 2012 and 2013! The highest crime rate for any category in 2012 is 40000+, while it is just 6000+ for 2013. I don’t know if this is related to the fact that Marijuana was legalized in November 2012, but I certainly found this interesting.</p>
+<h1><a id="Conclusion_80"></a>Conclusion</h1>
+<p>This is a basic approach to crime data analysis. You look for significant events between the years that your dataset consists of and try looking for patterns. You can also begin by simply analyzing the trends by creating a summary plot of your dataset.</p>
+<p>Hope you found this helpful. Thank you!</p>
+
+</body></html>
